@@ -515,7 +515,9 @@ $('#passTake').textContent = `${HOME} had ${F.possession.H}% of the ball and ${F
 
 // Attack
 const shots = { H: F.shots.H, A: F.shots.A }
-const sot = a => a.filter(s => s.outcome === 'Goal' || s.outcome === 'Save').length
+// Same rule as the report app: goals, saves, and blocks stopped on the goal line between the posts
+const sot = a => a.filter(s => s.outcome === 'Goal' || s.outcome === 'Save' ||
+  (s.outcome === 'Block' && s.ex != null && s.ex >= F.pitch.width - 2.5 && s.ey != null && s.ey >= F.pitch.goalYMin && s.ey <= F.pitch.goalYMax)).length
 const pen = F.shots.A.find(s => s.xg === 0.76)
 $('#xgVs').innerHTML = [['H', HOME, C.ink], ['A', AWAY, C.green]].map(([k, n, c], i) => `<div class="panel rv" style="--d:${.15 + i * .1}s"><span class="label">${n}</span><span class="num" data-count="${F.xg[k]}" data-dec="2">${F.xg[k].toFixed(2)}</span><span class="body" style="font-size:24px"><b>xG</b> · ${shots[k].length} shots · ${sot(shots[k])} on target</span></div>`).join('')
 $('#shotTake').textContent = `${HOME} took ${shots.H.length} shots worth ${F.xg.H.toFixed(2)} xG. ${AWAY} created ${F.xg.A.toFixed(2)} xG from ${shots.A.length} shots${pen ? `, ${pen.xg.toFixed(2)} of it from a penalty` : ''}.`
